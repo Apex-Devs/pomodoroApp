@@ -8,15 +8,14 @@ import javax.sql.DataSource;
 
 public class ConfigDB {
 
-    @Value("$spring.datasource.username")
-    private String url; //="jdbc:mysql://localhost:3306/pomodoroapp?serverTimezone=UTC";
-    @Value("$spring.datasource.url")
+    @Value("${spring.datasource.url}")
+    private String url; //="jdbc:mysql://localhost:3307/pomodoroapp?serverTimezone=UTC";
+    @Value("${spring.datasource.username}")
     private String user;//="root";
+    @Value("${spring.datasource.password}")
+    private String password;//="123";
 
-    @Value("$spring.datasource.password")
-    private String password;//="david";
-
-    @Bean
+    //@Bean
     public DataSource dataSource(){
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
         dataSourceBuilder.driverClassName("com.mysql.jdbc.Driver");//("com.microsoft.sqlserver.jdbc.SQLServerDriver");

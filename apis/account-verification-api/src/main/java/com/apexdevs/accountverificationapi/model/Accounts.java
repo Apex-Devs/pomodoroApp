@@ -1,6 +1,7 @@
-package com.apexdevs.accountcreationapi.model;
+package com.apexdevs.accountverificationapi.model;
 
 import lombok.Data;
+
 import javax.persistence.*;
 
 @Data
@@ -9,13 +10,6 @@ import javax.persistence.*;
 public class Accounts {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_usuario")
-    private Integer id_usuario;
-
-    @Column(name="nombre")
-    private String nombre;
-
     @Column(name="correo")
     private String correo;
 

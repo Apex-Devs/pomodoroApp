@@ -45,7 +45,7 @@ public class AccountsController {
 
             enviarCorreoConfirmacion(accounts.getCorreo(),mailHeader,mailBody);
 
-            return ResponseEntity.ok("Profesor creado exitosamente");
+            return ResponseEntity.ok("Cuenta creada exitosamente");
 
             // Hacer algo con el objeto deserializado...
         } catch (Exception e) {

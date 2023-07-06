@@ -30,11 +30,9 @@ public class AccountsController {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    String mailBody = "Recuperacion de contraseña\nURL pendiente";
-    String mailHeader = "Correo de recuperacion de contraseña Pomodoro App";
 
-    // Simulación de la base de datos
-    private static Map<String, String> usuarios = obtenerRegistrosCuentas();
+
+
 
     //Metodo get para realizar login
     @GetMapping("/login")
@@ -82,31 +80,7 @@ public class AccountsController {
         }
     }
 
-    @GetMapping("/passwordRecover")
-    public ResponseEntity<String> passwordRecover(
-        @RequestBody String requestBody,
-        ObjectMapper objectMapper,
-        BindingResult bindingResult
-    ) {
-            try {
-                // Deserializar JSON a objeto
-                Accounts accounts = objectMapper.readValue(requestBody, Accounts.class);
-                if (bindingResult.hasErrors()) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body("Error en los datos enviados");
-                }
 
-                enviarCorreoConfirmacion(accounts.getCorreo(),mailHeader,mailBody);
-
-                return ResponseEntity.ok("Correo enviado exitosamente");
-
-            } catch (Exception e) {
-                // Manejar la excepción en caso de que ocurra un error durante la deserialización
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
-            }
-    }
 
     //------------------------Confirmacion  //TODO
 
@@ -131,40 +105,6 @@ public class AccountsController {
 
 
     //--------------------------------------------------------------------------------------
-    public static Map<String, String> obtenerRegistrosCuentas() {
-        // Crear el HashMap para almacenar los registros de la tabla "cuentas"
-        Map<String, String> usuarios = new HashMap<>();
 
-        try{
-            // Establecer la conexión a la base de datos
-            DataSource connection = getConnectionDB();
-            // Crear la sentencia SQL para obtener todos los registros de la tabla "cuentas"
-            String query = "SELECT correo, contraseña FROM cuentas";
-
-            // Crear el Statement y ejecutar la consulta
-            try (PreparedStatement statement = connection.getConnection().prepareStatement(query);
-                 ResultSet resultSet = statement.executeQuery(query)) {
-                // Recorrer el resultado del ResultSet y agregar los registros al HashMap
-                while (resultSet.next()) {
-                    String correo = resultSet.getString("correo");
-                    String contraseña = resultSet.getString("contraseña");
-                    usuarios.put(correo, contraseña);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return usuarios;
-    }
-
-    public static DataSource getConnectionDB(){
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/pomodoroapp?serverTimezone=UTC");
-        dataSourceBuilder.username("root");
-        dataSourceBuilder.password("david");
-        return  dataSourceBuilder.build();
-    }
 
 }

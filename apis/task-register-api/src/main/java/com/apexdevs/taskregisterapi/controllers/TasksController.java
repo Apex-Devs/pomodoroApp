@@ -77,10 +77,4 @@ public class TasksController {
         }
     }
 
-
-    private String convertToJson(Object object) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(object);
-    }
-
 }

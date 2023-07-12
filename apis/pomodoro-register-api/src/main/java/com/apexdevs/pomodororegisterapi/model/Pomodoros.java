@@ -11,6 +11,7 @@ import java.sql.Time;
 public class Pomodoros {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_pomodoro")
     private Integer id_pomodoro;
 
@@ -26,7 +27,7 @@ public class Pomodoros {
     @JsonFormat(pattern = "mm:ss")
     private Time tiempo_longbreak;
 
-    @Column(name="id_tarea")
-    private Integer id_tarea;
+    @Column(name="fktarea")
+    private Integer fktarea;
 
 }

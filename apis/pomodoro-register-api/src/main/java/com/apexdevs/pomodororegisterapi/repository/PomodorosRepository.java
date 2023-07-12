@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface PomodorosRepository extends JpaRepository<Pomodoros,Integer> {
-    List<Pomodoros> findById_tarea(Integer id_tarea);
+    List<Pomodoros> findByFktarea(Integer fktarea);
 
 }

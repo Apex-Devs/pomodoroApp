@@ -1,7 +1,6 @@
 package com.apexdevs.pomodororegisterapi.controllers;
 
-import com.apexdevs.accountcreationapi.model.Accounts;
-import com.apexdevs.accountcreationapi.repository.AccountsRepository;
+
 import com.apexdevs.pomodororegisterapi.model.Pomodoros;
 import com.apexdevs.pomodororegisterapi.repository.PomodorosRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,14 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.util.List;
 
-//AccountRepository -> AccountsController ----- @Controller -> RestController
+//PomodorosRepository -> PomodorosController ----- @Controller -> RestController
 @RestController
 public class PomodorosController {
     @Autowired
@@ -63,14 +57,14 @@ public class PomodorosController {
         try {
             // Deserializar JSON a objeto
             Pomodoros pomodoros = objectMapper.readValue(requestBody, Pomodoros.class);
-            taskID = pomodoros.getId_tarea();
+            taskID = pomodoros.getFktarea();
             String json="";
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Error en los datos enviados");
             }
 
-            List<Pomodoros> pomodorosListByTaskId = pomodorosRepository.findById_tarea(taskID);
+            List<Pomodoros> pomodorosListByTaskId = pomodorosRepository.findByFktarea(taskID);
             json = objectMapper.writeValueAsString(pomodorosListByTaskId);
 
             return new ResponseEntity<>(json, HttpStatus.OK);

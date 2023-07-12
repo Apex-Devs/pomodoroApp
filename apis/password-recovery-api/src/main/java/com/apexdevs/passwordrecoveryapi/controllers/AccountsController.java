@@ -32,25 +32,51 @@ public class AccountsController {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    String mailBodyModify = "En hora buena su contraseña fue modificada";
+    Accounts accountEmail;
+
+    String mailBodyModify = "Enhorabuena su contraseña fue modificada";
     String mailHeaderModify = "Correo de confirmacion cambio de contraseña Pomodoro App";
 
-    String mailBodyRecover = "Recuperacion de contraseña\nURL pendiente";
+    String mailBodyRecover = "Usted ha solicitado la recuperacion de su contraseña.\nEn caso de no ser asi " +
+            "omita este mensaje.\n";
     String mailHeaderRecover = "Correo de recuperacion de contraseña Pomodoro App";
 
-    // Simulación de la base de datos
-    private static Map<String, String> usuarios = obtenerRegistrosCuentas();
+    String url = "";
+    String fullMail = "";
+
+    //Primer endpoint -----------------
+    @GetMapping("/passwordRecover")
+    public ResponseEntity<String> passwordRecover(
+            @RequestBody String requestBody,
+            ObjectMapper objectMapper,
+            BindingResult bindingResult
+    ) {
+        try {
+            // Deserializar JSON a objeto
+            accountEmail = objectMapper.readValue(requestBody, Accounts.class);
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Error en los datos enviados");
+            }
+
+            url="http://localhost:8080/"+accountEmail.getCorreo()+"/updatePassword";
+            fullMail=mailBodyRecover+url;
+            enviarCorreoConfirmacion(accountEmail.getCorreo(),mailHeaderRecover,fullMail);
+
+            return ResponseEntity.ok("Correo enviado exitosamente");
+
+        } catch (Exception e) {
+            // Manejar la excepción en caso de que ocurra un error durante la deserialización
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error en los datos enviados");
+        }
+    }
+    //----------------------------
 
     //Metodo post para realizar insercion con Json
 
-    @GetMapping("/{correo}/edit")
-    public ResponseEntity<Object> editPassword(@PathVariable String correo) {
-        Accounts accounts = accountsRepository.findById(correo)
-                .orElseThrow(EntityNotFoundException::new);
-        return ResponseEntity.ok().body(accounts);
-    }
-
-    @PostMapping("/{correo}/edit")
+    @PostMapping("/{correo}/updatePassword")
     public ResponseEntity<Object> updatePassword(
             @PathVariable String correo,
             @RequestBody String requestBody,
@@ -70,12 +96,12 @@ public class AccountsController {
                         .body("Error en los datos enviados");
             }
             account.setCorreo(accounts.getCorreo());
-
-            accountsRepository.save(account);
+            account.setNombre(accounts.getNombre());
+            accountsRepository.save(account); //Guardamos la nueva contraseña
 
             enviarCorreoConfirmacion(account.getCorreo(),mailHeaderModify,mailBodyModify);
 
-            ra.addFlashAttribute("msgExito", "Correo actualizado");
+            ra.addFlashAttribute("msgExito", "Contraseña actualizada");
             return ResponseEntity.ok().body("redirect:/");
         } catch (Exception e) {
             // Manejar la excepción en caso de que ocurra un error durante la deserialización
@@ -85,31 +111,7 @@ public class AccountsController {
         }
     }
 
-    @GetMapping("/passwordRecover")
-    public ResponseEntity<String> passwordRecover(
-            @RequestBody String requestBody,
-            ObjectMapper objectMapper,
-            BindingResult bindingResult
-    ) {
-        try {
-            // Deserializar JSON a objeto
-            Accounts accounts = objectMapper.readValue(requestBody, Accounts.class);
-            if (bindingResult.hasErrors()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
-            }
 
-            enviarCorreoConfirmacion(accounts.getCorreo(),mailHeaderRecover,mailBodyRecover);
-
-            return ResponseEntity.ok("Correo enviado exitosamente");
-
-        } catch (Exception e) {
-            // Manejar la excepción en caso de que ocurra un error durante la deserialización
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error en los datos enviados");
-        }
-    }
 
     //------------------------Confirmacion
 
@@ -133,39 +135,4 @@ public class AccountsController {
     }
 
     //---------------------------------------------------------
-    public static Map<String, String> obtenerRegistrosCuentas() {
-        // Crear el HashMap para almacenar los registros de la tabla "cuentas"
-        Map<String, String> usuarios = new HashMap<>();
-
-        try{
-            // Establecer la conexión a la base de datos
-            DataSource connection = getConnectionDB();
-            // Crear la sentencia SQL para obtener todos los registros de la tabla "cuentas"
-            String query = "SELECT correo, contraseña FROM cuentas";
-
-            // Crear el Statement y ejecutar la consulta
-            try (PreparedStatement statement = connection.getConnection().prepareStatement(query);
-                 ResultSet resultSet = statement.executeQuery(query)) {
-                // Recorrer el resultado del ResultSet y agregar los registros al HashMap
-                while (resultSet.next()) {
-                    String correo = resultSet.getString("correo");
-                    String contraseña = resultSet.getString("contraseña");
-                    usuarios.put(correo, contraseña);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return usuarios;
-    }
-
-    public static DataSource getConnectionDB(){
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/pomodoroapp?serverTimezone=UTC");
-        dataSourceBuilder.username("root");
-        dataSourceBuilder.password("david");
-        return  dataSourceBuilder.build();
-    }
 }

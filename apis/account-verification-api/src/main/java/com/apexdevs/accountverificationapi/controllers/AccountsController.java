@@ -31,6 +31,8 @@ public class AccountsController {
     ObjectMapper objectMapper = new ObjectMapper();
 
 
+    // Simulación de la base de datos
+    private static Map<String, String> usuarios = obtenerRegistrosCuentas();
 
 
 
@@ -105,6 +107,41 @@ public class AccountsController {
 
 
     //--------------------------------------------------------------------------------------
+    public static Map<String, String> obtenerRegistrosCuentas() {
+        // Crear el HashMap para almacenar los registros de la tabla "cuentas"
+        Map<String, String> usuarios = new HashMap<>();
+
+        try{
+            // Establecer la conexión a la base de datos
+            DataSource connection = getConnectionDB();
+            // Crear la sentencia SQL para obtener todos los registros de la tabla "cuentas"
+            String query = "SELECT correo, contraseña FROM cuentas";
+
+            // Crear el Statement y ejecutar la consulta
+            try (PreparedStatement statement = connection.getConnection().prepareStatement(query);
+                 ResultSet resultSet = statement.executeQuery(query)) {
+                // Recorrer el resultado del ResultSet y agregar los registros al HashMap
+                while (resultSet.next()) {
+                    String correo = resultSet.getString("correo");
+                    String contraseña = resultSet.getString("contraseña");
+                    usuarios.put(correo, contraseña);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return usuarios;
+    }
+
+    public static DataSource getConnectionDB(){
+        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
+        dataSourceBuilder.url("jdbc:mysql://localhost:3306/pomodoroapp?serverTimezone=UTC");
+        dataSourceBuilder.username("root");
+        dataSourceBuilder.password("david");
+        return  dataSourceBuilder.build();
+    }
 
 
 }

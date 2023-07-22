@@ -6,25 +6,25 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "tareas")
+@Table(name = "tasks")
 public class Tasks {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_tarea")
-    private Integer id_tarea;
+    @Column(name="id_task")
+    private Integer id_task;
 
-    @Column(name="nombre_tarea")
-    private String nombre_tarea;
+    @Column(name="task_name")
+    private String task_name;
 
-    @Column(name="descripcion_tarea")
-    private String descripcion_tarea;
+    @Column(name="task_description")
+    private String task_description;
 
-    @Column(name="numero_pomodoros")
-    private Integer numero_pomodoros;
+    @Column(name="pomodoro_quantity")
+    private Integer pomodoro_quantity;
 
-    @Column(name="correo")
-    private String correo;
+    @Column(name="email")
+    private String email;
 
 
 

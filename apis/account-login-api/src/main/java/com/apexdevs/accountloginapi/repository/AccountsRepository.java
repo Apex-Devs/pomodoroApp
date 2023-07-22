@@ -1,7 +1,6 @@
-package com.apexdevs.accountverificationapi.repository;
+package com.apexdevs.accountloginapi.repository;
 
-
-import com.apexdevs.accountverificationapi.model.Accounts;
+import com.apexdevs.accountloginapi.model.Accounts;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

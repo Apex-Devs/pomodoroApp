@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface TasksRepository extends JpaRepository<Tasks,Integer> {
 
-    List<Tasks> findByCorreo(String correo);
+    List<Tasks> findByEmail(String email);
 
 }

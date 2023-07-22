@@ -24,57 +24,52 @@ public class AccountsController {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    String mailBody = "En hora buena su cuenta fue creada";
-    String mailHeader = "Correo de confirmacion Pomodoro App";
+    String mailBody = "Congratulations! your account has been created";
+    String mailHeader = "Confirmation Email from PomodoroApp";
 
-    //Metodo post para realizar insercion con Json
-    @PostMapping("/add")
+    //Post method that receive json object and uses the information to register an account
+    @PostMapping("/addAccount")
     public ResponseEntity<String> createAccount(
             @RequestBody String requestBody,
             ObjectMapper objectMapper,
             BindingResult bindingResult
     ) {
         try {
-            // Deserializar JSON a objeto
+            // Deserialization of a json object
             Accounts accounts = objectMapper.readValue(requestBody, Accounts.class);
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
+                        .body("Error in the data that has been send");
             }
             accountsRepository.save(accounts);
 
-            enviarCorreoConfirmacion(accounts.getCorreo(),mailHeader,mailBody);
+            sendConfirmationEmail(accounts.getEmail(),mailHeader,mailBody);
 
-            return ResponseEntity.ok("Cuenta creada exitosamente");
+            return ResponseEntity.ok("Account has been created successfully");
 
-            // Hacer algo con el objeto deserializado...
         } catch (Exception e) {
-            // Manejar la excepción en caso de que ocurra un error durante la deserialización
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error en los datos enviados");
+                    .body("Error in the data that has been send");
         }
     }
 
-    //------------------------Confirmacion
-
+    //------------------------Confirmation email method
     @Autowired
     private JavaMailSender javaMailSender;
-
-    // Método para enviar un correo de confirmación
-    public void enviarCorreoConfirmacion(String destinatario, String asunto, String cuerpo) {
-        MimeMessage mensaje = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mensaje);
+    public void sendConfirmationEmail(String addressee, String subject, String body) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setTo(destinatario);
-            helper.setSubject(asunto);
-            helper.setText(cuerpo);
+            helper.setTo(addressee);
+            helper.setSubject(subject);
+            helper.setText(body);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
 
-        javaMailSender.send(mensaje);
+        javaMailSender.send(message);
     }
 
 }

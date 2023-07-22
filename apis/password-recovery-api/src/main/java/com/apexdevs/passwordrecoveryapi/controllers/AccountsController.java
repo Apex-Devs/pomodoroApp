@@ -34,12 +34,12 @@ public class AccountsController {
 
     Accounts accountEmail;
 
-    String mailBodyModify = "Enhorabuena su contraseña fue modificada";
-    String mailHeaderModify = "Correo de confirmacion cambio de contraseña Pomodoro App";
+    String mailBodyModify = "Your password has been changed";
+    String mailHeaderModify = "Confirmation email, your password has changed |PomodoroApp";
 
-    String mailBodyRecover = "Usted ha solicitado la recuperacion de su contraseña.\nEn caso de no ser asi " +
-            "omita este mensaje.\n";
-    String mailHeaderRecover = "Correo de recuperacion de contraseña Pomodoro App";
+    String mailBodyRecover = "You have requested recovery password.\nIn case you did not request this change" +
+            "skip this message.\n";
+    String mailHeaderRecover = "Recover your password |Pomodoro App";
 
     String url = "";
     String fullMail = "";
@@ -52,29 +52,26 @@ public class AccountsController {
             BindingResult bindingResult
     ) {
         try {
-            // Deserializar JSON a objeto
+            //Deserialization of a json object
             accountEmail = objectMapper.readValue(requestBody, Accounts.class);
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
+                        .body("Error in the data that has been send");
             }
 
-            url="http://localhost:8080/"+accountEmail.getCorreo()+"/updatePassword";
+            url="http://localhost:8080/password-recovery-api/"+accountEmail.getEmail()+"/updatePassword";
             fullMail=mailBodyRecover+url;
-            enviarCorreoConfirmacion(accountEmail.getCorreo(),mailHeaderRecover,fullMail);
+            sendConfirmationEmail(accountEmail.getEmail(),mailHeaderRecover,fullMail);
 
-            return ResponseEntity.ok("Correo enviado exitosamente");
+            return ResponseEntity.ok("Email has been send successfully");
 
         } catch (Exception e) {
-            // Manejar la excepción en caso de que ocurra un error durante la deserialización
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error en los datos enviados");
+                    .body("Error in the data that has been send");
         }
     }
-    //----------------------------
 
-    //Metodo post para realizar insercion con Json
 
     @PostMapping("/{correo}/updatePassword")
     public ResponseEntity<Object> updatePassword(
@@ -93,46 +90,40 @@ public class AccountsController {
             Accounts account = objectMapper.readValue(requestBody, Accounts.class);
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
+                        .body("Error in the data that has been send");
             }
-            account.setCorreo(accounts.getCorreo());
-            account.setNombre(accounts.getNombre());
-            accountsRepository.save(account); //Guardamos la nueva contraseña
+            account.setEmail(accounts.getEmail());
+            account.setName(accounts.getName());
+            accountsRepository.save(account); //Save the new password
 
-            enviarCorreoConfirmacion(account.getCorreo(),mailHeaderModify,mailBodyModify);
+            sendConfirmationEmail(account.getEmail(),mailHeaderModify,mailBodyModify);
 
-            ra.addFlashAttribute("msgExito", "Contraseña actualizada");
+            ra.addFlashAttribute("sucessfulMsg", "Password updated");
             return ResponseEntity.ok().body("redirect:/");
         } catch (Exception e) {
-            // Manejar la excepción en caso de que ocurra un error durante la deserialización
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error en los datos enviados");
+                    .body("Error in the data that has been send");
         }
     }
 
 
 
-    //------------------------Confirmacion
-
     @Autowired
     private JavaMailSender javaMailSender;
-
-    // Método para enviar un correo de confirmación
-    public void enviarCorreoConfirmacion(String destinatario, String asunto, String cuerpo) {
-        MimeMessage mensaje = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mensaje);
+    public void sendConfirmationEmail(String addressee, String subject, String body) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setTo(destinatario);
-            helper.setSubject(asunto);
-            helper.setText(cuerpo);
+            helper.setTo(addressee);
+            helper.setSubject(subject);
+            helper.setText(body);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
 
-        javaMailSender.send(mensaje);
+        javaMailSender.send(message);
     }
 
-    //---------------------------------------------------------
 }

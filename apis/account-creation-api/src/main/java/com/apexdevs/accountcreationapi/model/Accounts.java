@@ -5,17 +5,17 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "cuentas")
+@Table(name = "accounts")
 public class Accounts {
 
     @Id
-    @Column(name="correo")
-    private String correo;
+    @Column(name="email")
+    private String email;
 
-    @Column(name="nombre")
-    private String nombre;
+    @Column(name="name")
+    private String name;
 
-    @Column(name="contraseña")
-    private String contraseña;
+    @Column(name="password")
+    private String password;
 
 }

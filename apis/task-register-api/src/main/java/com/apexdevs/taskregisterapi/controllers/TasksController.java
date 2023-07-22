@@ -30,22 +30,20 @@ public class TasksController {
             BindingResult bindingResult
     ) {
         try {
-            // Deserializar JSON a objeto
+            // Deserialization of JSON object
             Tasks tasks = objectMapper.readValue(requestBody, Tasks.class);
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
+                        .body("Error in the data that has been send");
             }
 
-            //accountEmail = tasks.getCorreo();
             tasksRepository.save(tasks);
-            return ResponseEntity.ok("Tarea registrada exitosamente");
+            return ResponseEntity.ok("Task added successfully");
 
         } catch (Exception e) {
-            // Manejar la excepción en caso de que ocurra un error durante la deserialización
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error en los datos enviados");
+                    .body("Error in the data that has been send");
         }
     }
 
@@ -58,22 +56,22 @@ public class TasksController {
             BindingResult bindingResult
     ) {
         try {
-            // Deserializar JSON a objeto
+            // Deserialization of JSON object
             Tasks tasks = objectMapper.readValue(requestBody, Tasks.class);
-            accountEmail = tasks.getCorreo();
+            accountEmail = tasks.getEmail();
             String json="";
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Error en los datos enviados");
             }
 
-            List<Tasks> tasksListByCorreo = tasksRepository.findByCorreo(accountEmail);
-            json = objectMapper.writeValueAsString(tasksListByCorreo);
+            List<Tasks> tasksListByEmail = tasksRepository.findByEmail(accountEmail);
+            json = objectMapper.writeValueAsString(tasksListByEmail);
 
             return new ResponseEntity<>(json, HttpStatus.OK);
 
         } catch (Exception e) {
-            return new ResponseEntity<>("Error al convertir a JSON", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error converting to JSON", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

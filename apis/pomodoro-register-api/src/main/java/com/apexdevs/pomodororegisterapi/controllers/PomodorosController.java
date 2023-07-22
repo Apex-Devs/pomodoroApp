@@ -28,49 +28,46 @@ public class PomodorosController {
             BindingResult bindingResult
     ) {
         try {
-            // Deserializar JSON a objeto
+            // Deserialization of JSON object
             Pomodoros pomodoros = objectMapper.readValue(requestBody, Pomodoros.class);
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
+                        .body("Error in the data that has been send");
             }
-
-            //accountEmail = tasks.getCorreo();
             pomodorosRepository.save(pomodoros);
-            return ResponseEntity.ok("Pomodoro registrado exitosamente");
+            return ResponseEntity.ok("Pomodoro added successfully");
 
         } catch (Exception e) {
-            // Manejar la excepción en caso de que ocurra un error durante la deserialización
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error en los datos enviados");
+                    .body("Error in the data that has been send");
         }
     }
 
 
-    @GetMapping("/listPomodoro")
+    @GetMapping("/listPomodoros")
     public ResponseEntity<String> listPomodoros(
             @RequestBody String requestBody,
             ObjectMapper objectMapper,
             BindingResult bindingResult
     ) {
         try {
-            // Deserializar JSON a objeto
+            // Deserialization of JSON object
             Pomodoros pomodoros = objectMapper.readValue(requestBody, Pomodoros.class);
-            taskID = pomodoros.getFktarea();
+            taskID = pomodoros.getFktask();
             String json="";
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
+                        .body("Error in the data that has been send");
             }
 
-            List<Pomodoros> pomodorosListByTaskId = pomodorosRepository.findByFktarea(taskID);
+            List<Pomodoros> pomodorosListByTaskId = pomodorosRepository.findByFktask(taskID);
             json = objectMapper.writeValueAsString(pomodorosListByTaskId);
 
             return new ResponseEntity<>(json, HttpStatus.OK);
 
         } catch (Exception e) {
-            return new ResponseEntity<>("Error al convertir a JSON", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error converting JSON", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

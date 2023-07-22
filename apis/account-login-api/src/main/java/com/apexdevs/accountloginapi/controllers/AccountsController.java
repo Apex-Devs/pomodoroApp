@@ -1,7 +1,8 @@
-package com.apexdevs.accountverificationapi.controllers;
+package com.apexdevs.accountloginapi.controllers;
 
-import com.apexdevs.accountverificationapi.model.Accounts;
-import com.apexdevs.accountverificationapi.repository.AccountsRepository;
+
+import com.apexdevs.accountloginapi.model.Accounts;
+import com.apexdevs.accountloginapi.repository.AccountsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -11,14 +12,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,12 +33,12 @@ public class AccountsController {
     ObjectMapper objectMapper = new ObjectMapper();
 
 
-    // Simulación de la base de datos
-    private static Map<String, String> usuarios = obtenerRegistrosCuentas();
+    //Hashmap that contains the registers from the accounts table
+    private static Map<String, String> users = getAccountsInfo();
 
 
 
-    //Metodo get para realizar login
+    //Get Endpoint for login into pomodoroApp
     @GetMapping("/login")
     public ResponseEntity<String> loginAccount(
             @RequestBody String requestBody,
@@ -48,90 +50,85 @@ public class AccountsController {
             Accounts accounts = objectMapper.readValue(requestBody, Accounts.class);
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error en los datos enviados");
+                        .body("Error in the data that has been send");
             }
 
-            // Obtener los parámetros correo y contraseña
-            String correo = accounts.getCorreo();//usuario.getCorreo();
-            String contrasena = accounts.getContraseña();//usuario.getContrasena();
+            String email = accounts.getEmail();
+            String password = accounts.getPassword();
 
             // Verificar si el correo existe en la base de datos
-            if (usuarios.containsKey(correo)) {
-                // Obtener la contraseña almacenada para el correo
-                String contrasenaAlmacenada = usuarios.get(correo);
+            if (users.containsKey(email)) {
+                // Get the password from the database
+                String passwordFromRegisters = users.get(email);
 
-                // Verificar si la contraseña recibida coincide con la almacenada
-                if (contrasena.equals(contrasenaAlmacenada)) {
-                    // La contraseña es correcta
-                    return ResponseEntity.ok("Contraseña correcta\nInicio de sesion exitoso!!");
+                // Verify is the password that is receive is correct or wrong
+                if (password.equals(passwordFromRegisters)) {
+                    // Correct password
+                    return ResponseEntity.ok("Correct credentials\nLogin has been successful!!!");
                 } else {
-                    // La contraseña es incorrecta
+                    // Password is wrong
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body("Contraseña incorrecta");
+                            .body("Wrong password");
                 }
             } else {
-                // El correo no existe en la base de datos
+                // Email dosnt exist in the database
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Correo no encontrado");
+                        .body("Email not found");
             }
         } catch (Exception e) {
-            // Manejar la excepción en caso de que ocurra un error durante la deserialización
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error en los datos enviados");
+                    .body("Error in the data that has been send");
         }
     }
 
 
 
-    //------------------------Confirmacion  //TODO
-
+    //------------------------Confirmation email method //TODO
     @Autowired
     private JavaMailSender javaMailSender;
-
-    // Método para enviar un correo de confirmación
-    public void enviarCorreoConfirmacion(String destinatario, String asunto, String cuerpo) {
-        MimeMessage mensaje = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mensaje);
+    public void sendConfirmationEmail(String addressee, String subject, String body) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setTo(destinatario);
-            helper.setSubject(asunto);
-            helper.setText(cuerpo);
+            helper.setTo(addressee);
+            helper.setSubject(subject);
+            helper.setText(body);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
 
-        javaMailSender.send(mensaje);
+        javaMailSender.send(message);
     }
 
 
     //--------------------------------------------------------------------------------------
-    public static Map<String, String> obtenerRegistrosCuentas() {
-        // Crear el HashMap para almacenar los registros de la tabla "cuentas"
-        Map<String, String> usuarios = new HashMap<>();
+    public static Map<String, String> getAccountsInfo() {
+
+        //Creation of hashmap that contains the data of the accounts table
+        Map<String, String> users = new HashMap<>();
 
         try{
-            // Establecer la conexión a la base de datos
+            // Get connection to the database and define the query
             DataSource connection = getConnectionDB();
-            // Crear la sentencia SQL para obtener todos los registros de la tabla "cuentas"
-            String query = "SELECT correo, contraseña FROM cuentas";
+            String query = "SELECT email, password FROM accounts";
 
-            // Crear el Statement y ejecutar la consulta
+            // Create the statement and execute the query
             try (PreparedStatement statement = connection.getConnection().prepareStatement(query);
                  ResultSet resultSet = statement.executeQuery(query)) {
-                // Recorrer el resultado del ResultSet y agregar los registros al HashMap
+                // Loop through the resultSet and add the registers into the hashmap
                 while (resultSet.next()) {
-                    String correo = resultSet.getString("correo");
-                    String contraseña = resultSet.getString("contraseña");
-                    usuarios.put(correo, contraseña);
+                    String email = resultSet.getString("email");
+                    String password = resultSet.getString("password");
+                    users.put(email, password);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return usuarios;
+        return users;
     }
 
     public static DataSource getConnectionDB(){

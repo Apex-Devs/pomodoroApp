@@ -2,30 +2,29 @@ create database pomodoroapp;
 
 use pomodoroapp;
 
-create table cuentas(
-correo varchar(30) primary key not null,
-nombre varchar(30),
-contraseña varchar(25)
+create table accounts(
+email varchar(30) primary key not null,
+name varchar(30),
+password varchar(25)
 );
 
-create table tareas(
-id_tarea int primary key not null auto_increment,
-nombre_tarea varchar(60),
-descripcion_tarea varchar(300),
-numero_pomodoros int,
-correo varchar(30),
-foreign key(correo) references cuentas(correo) ON DELETE CASCADE ON UPDATE CASCADE
+create table tasks(
+id_task int primary key not null auto_increment,
+task_name varchar(60),
+task_description varchar(300),
+pomodoro_quantity int,
+email varchar(30),
+foreign key(email) references accounts(email) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table pomodoros(
 id_pomodoro int primary key not null auto_increment,
-tiempo_pomodoro time, 
-tiempo_shortbreak time, 
-tiempo_longbreak time, 
-fktarea int,
-foreign key(fktarea) references tareas(id_tarea) ON DELETE CASCADE ON UPDATE CASCADE
+time_pomodoro time, 
+time_shortbreak time, 
+time_longbreak time, 
+fktask int,
+foreign key(fktask) references tasks(id_task) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 
 
 

@@ -1,13 +1,13 @@
-package com.apexdevs.accountverificationapi;
+package com.apexdevs.accountloginapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AccountVerificationApiApplication {
+public class AccountLoginApiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AccountVerificationApiApplication.class, args);
+		SpringApplication.run(AccountLoginApiApplication.class, args);
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.apexdevs.passwordrecoveryapi.model;
+package com.apexdevs.accountloginapi.model;
 
 import lombok.Data;
 
@@ -11,7 +11,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "accounts")
 public class Accounts {
-
     @Id
     @Column(name="email")
     private String email;

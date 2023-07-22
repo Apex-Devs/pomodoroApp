@@ -1,10 +1,10 @@
-package com.apexdevs.accountverificationapi;
+package com.apexdevs.accountloginapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AccountVerificationApiApplicationTests {
+class AccountLoginApiApplicationTests {
 
 	@Test
 	void contextLoads() {

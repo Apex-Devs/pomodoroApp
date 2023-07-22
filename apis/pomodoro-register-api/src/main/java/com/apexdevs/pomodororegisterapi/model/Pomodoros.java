@@ -15,19 +15,19 @@ public class Pomodoros {
     @Column(name="id_pomodoro")
     private Integer id_pomodoro;
 
-    @Column(name="tiempo_pomodoro")
+    @Column(name="time_pomodoro")
     @JsonFormat(pattern = "mm:ss")
-    private Time tiempo_pomodoro;
+    private Time time_pomodoro;
 
-    @Column(name="tiempo_shortbreak")
+    @Column(name="time_shortbreak")
     @JsonFormat(pattern = "mm:ss")
-    private Time tiempo_shortbreak;
+    private Time time_shortbreak;
 
-    @Column(name="tiempo_longbreak")
+    @Column(name="time_longbreak")
     @JsonFormat(pattern = "mm:ss")
-    private Time tiempo_longbreak;
+    private Time time_longbreak;
 
-    @Column(name="fktarea")
-    private Integer fktarea;
+    @Column(name="fktask")
+    private Integer fktask;
 
 }
